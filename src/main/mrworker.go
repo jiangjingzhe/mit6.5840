@@ -10,17 +10,26 @@ package main
 // Please do not change this file.
 //
 
-import "6.5840/mr"
-import "plugin"
-import "os"
-import "fmt"
-import "log"
+import (
+	"fmt"
+	"log"
+	"os"
+	"plugin"
+
+	"6.5840/mr"
+)
 
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Fprintf(os.Stderr, "Usage: mrworker xxx.so\n")
 		os.Exit(1)
 	}
+	logFile, err := os.OpenFile("mr.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatalf("Failed to open log file: %v", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
 
 	mapf, reducef := loadPlugin(os.Args[1])
 
